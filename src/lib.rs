@@ -51,7 +51,7 @@ use active::Active;
 pub mod sampling_rate;
 use sampling_rate::SamplingRate;
 
-#[derive(Eq,PartialEq,Debug)]
+#[derive(Eq, PartialEq, Debug)]
 pub struct Register {
     pub address: u8,
     pub value: u16,
@@ -211,7 +211,10 @@ mod tests {
             w.mute().disable();
             w.both().disable()
         });
-        let expected = Register { address: 0, value:0b10111};
+        let expected = Register {
+            address: 0,
+            value: 0b10111,
+        };
         assert!(reg == expected);
         //bad raw bits volume
         let reg = WM8731::left_line_in(|w| {
@@ -219,7 +222,24 @@ mod tests {
             w.mute().disable();
             w.both().disable()
         });
-        let expected = Register { address: 0, value:0b1_1111};
-        assert!(reg == expected,"expected {:?}, got {:?}",expected,reg);
+        let expected = Register {
+            address: 0,
+            value: 0b1_1111,
+        };
+        assert!(reg == expected, "expected {:?}, got {:?}", expected, reg);
+    }
+
+    #[test]
+    fn headphone_out_build() {
+        let reg = WM8731::left_headphone_out(|w| {
+            w.volume(0b1111001);
+            w.zero_cross_detect().disable();
+            w.both().disable()
+        });
+        let expected = Register {
+            address: 0b10,
+            value: 0b1111001,
+        };
+        assert!(reg == expected, "expected {:?}, got {:?}", expected, reg);
     }
 }
