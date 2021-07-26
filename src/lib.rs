@@ -56,8 +56,15 @@ pub struct Register {
     pub value: u16,
 }
 
-#[cfg(test)]
-mod tests;
+impl Register {
+    /// Return a representation directly usable with SPI or I2C, that is an array of byte.
+    pub fn serialize(&self) -> [u8; 2] {
+        [
+            self.address << 1 | (self.value >> 8) as u8 & 0b1,
+            self.value as u8,
+        ]
+    }
+}
 
 /// A simple HAL for the Cirrus Logic/ Wolfson WM8731 audio codec
 pub struct WM8731 {}
@@ -175,5 +182,24 @@ impl WM8731 {
             address: 15,
             value: 0,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn register_serialize() {
+        let reg = Register {
+            address: 0b1,
+            value: 0b1_1011,
+        };
+        assert_eq!(reg.serialize(), [0b10, 0b1_1011]);
+        //value too huge
+        let reg = Register {
+            address: 0b1,
+            value: 0b1110_0001_1011,
+        };
+        assert_eq!(reg.serialize(), [0b10, 0b1_1011]);
     }
 }
