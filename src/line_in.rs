@@ -59,6 +59,11 @@ impl<'a> Volume<'a> {
         };
         self.half_dB_steps(rounded_to_multiple_of_three);
     }
+
+    /// Set volume field from raw bits.
+    pub fn bits(&mut self, bits: u8) {
+        self.bitmask.apply(self.index, 5, bits as u16);
+    }
 }
 
 impl LineIn {
