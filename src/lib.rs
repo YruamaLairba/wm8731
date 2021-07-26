@@ -51,6 +51,7 @@ use active::Active;
 pub mod sampling_rate;
 use sampling_rate::SamplingRate;
 
+#[derive(Eq,PartialEq,Debug)]
 pub struct Register {
     pub address: u8,
     pub value: u16,
@@ -201,5 +202,24 @@ mod tests {
             value: 0b1110_0001_1011,
         };
         assert_eq!(reg.serialize(), [0b10, 0b1_1011]);
+    }
+
+    #[test]
+    fn line_in_build() {
+        let reg = WM8731::left_line_in(|w| {
+            w.volume().nearest_dB(0);
+            w.mute().disable();
+            w.both().disable()
+        });
+        let expected = Register { address: 0, value:0b10111};
+        assert!(reg == expected);
+        //bad raw bits volume
+        let reg = WM8731::left_line_in(|w| {
+            w.volume().bits(0xff);
+            w.mute().disable();
+            w.both().disable()
+        });
+        let expected = Register { address: 0, value:0b1_1111};
+        assert!(reg == expected,"expected {:?}, got {:?}",expected,reg);
     }
 }
