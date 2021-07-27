@@ -14,15 +14,15 @@ impl HeadphoneOut {
         }
     }
 
-    /// Headphone output volume control
+    /// Set headphone output volume control with raw bits
     ///
     /// Min: -73dB
     ///
     /// Max: +6dB
     ///
     /// Step: 1dB
-    pub fn volume(&mut self, volume: u16) {
-        self.data |= 0b0_0000_0000
+    pub fn volume(&mut self, volume: u8) {
+        self.data = self.data & !0b111_1111| (volume & 0b111_1111) as u16;
     }
 
     /// Zero cross detect
